@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Parantez Transalocation Map</title>
+    <link rel="stylesheet" href="/static/css/animate.css" />
+    <script type="text/javascript" src="/static/js/socket.io.min.js"></script>  
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" ></script>
+    <script type="text/javascript" src="/static/js/noty/jquery.noty.packaged.min.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=apikey&libraries=visualization"></script>
+    
+    <!--<script src="/static/js/markerclusterer/markerclusterer.js">-->
+
+    <meta name="viewport" content="initial-scale=1, minimal-ui" />
+    <meta charset="utf-8">
+    <style>
+      #map {height: 100%;}
+      html, body {height: 100%;margin: 0;padding: 0;}
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+$(document).ready(function () {
+
+      var map , heatmap, pointArray;
+
+      var mapData = [];
+      var pointArray = new google.maps.MVCArray(mapData);
+
+      var socket = io.connect('/');
+        socket.on('super event', function (data) {
+        mapData.push([data.latitude,data.longitude]);
+        var n = noty({text: data.name + ' - '+ data.amount});
+        console.log(data);;
+      });
+
+    initMap();
+
+      function initMap() {
+        
+        map = new google.maps.Map(document.getElementById('map'), { 
+            //mapTypeId: google.maps.MapTypeId.ROADMAP,
+            scrollwheel: false,
+            panControl: false,
+            zoomControl: true,
+            zoomControlOptions: {
+                style: google.maps.ZoomControlStyle.LARGE,
+                position: google.maps.ControlPosition.LEFT_TOP
+            },
+            mapTypeControl: false,
+            streetViewControl: false,
+            center: {lat: 41.008238, lng: 28.978359},
+            //center :{lat:41.113366 , lng:29.022756},
+            zoom: 12
+        });
+
+        pointArray = new google.maps.MVCArray(mapData);
+        
+        heatmap = new google.maps.visualization.HeatmapLayer({
+          data: pointArray
+        });
+
+        heatmap.setMap(map);
+      } 
+
+      function reLoad(Ddatas) {
+          var _temp = [];
+          for (a in Ddatas) {
+              _temp.push(new google.maps.LatLng(
+                  Ddatas[a][0],
+                  Ddatas[a][1]));
+          }
+          return (_temp);
+      }
+
+
+    setInterval(function(){
+          pointArray = new google.maps.MVCArray(reLoad(mapData));
+          heatmap.setData(pointArray);
+        }, 5000);
+
+$.noty.defaults = {
+    layout: 'topRight',
+    theme: 'relax', // or 'relax'
+    type: 'success',
+    text: '', // can be html or string
+    dismissQueue: true, // If you want to use queue feature set this true
+    template: '<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
+    timeout: 1500,
+    animation: {
+          open: 'animated tada',
+          close: 'animated fadeOutUp'
+    },
+    force: false, // adds notification to the beginning of queue when set to true
+    modal: false,
+    maxVisible: 15, // you can set max visible notification for dismissQueue true option,
+    killer: false, // for close all notifications before show
+    closeWith: ['click'], // ['click', 'button', 'hover', 'backdrop'] // backdrop click will close all notifications
+    callback: {
+        onShow: function() {},
+        afterShow: function() {},
+        onClose: function() {},
+        afterClose: function() {},
+        onCloseClick: function() {},
+    },
+    buttons: false // an array of buttons
+};
+
+});
+    </script>
+  </body>
+</html>

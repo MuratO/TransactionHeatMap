@@ -1,0 +1,16 @@
+{
+  "name": "map-base-transaction-api",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "main": "./bin/www",
+  "dependencies": {
+    "body-parser": "*",
+    "express": "*",
+    "socket.io": "*",
+    "noty":"*"
+  },
+  "author": "iam"
+}
