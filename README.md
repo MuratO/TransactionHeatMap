@@ -1,2 +1,2 @@
 # TransactionHeatMap
-Web socket based Transaction Heat Map for Node.js.
+Web socket based Transaction Heat Map using Node.js.
